@@ -1,5 +1,8 @@
 #include "pool_alloc.h"
 
+#ifndef POOL_TESTS_H
+#define POOL_ALLOC_H
+
 /* 
  * NOTE: Tests that do not satisfy input assumptions are omitted
 */ 	
@@ -9,14 +12,16 @@
  *
  * Complement test functionality
 */
-void pool_deinit(void); // Setup for reinitializing global objects between tests
+// Setup for reinitializing global objects between tests
+void pool_deinit(void); 
 
+// Verify overall default heap correctness
 bool verify_heap_init_base(const size_t* block_sizes, size_t block_size_count);
 
-// Verify pool controller struct 
+// Verify default pool controller struct 
 bool verify_heap_init_pool_controller(const size_t* block_sizes, size_t block_size_count);
 
-// Check references between block across g_pool_heap
+// Check default references between blocks across g_pool_heap
 bool verify_heap_init_block_references(const size_t* block_sizes, size_t block_size_count);
 
 
@@ -30,28 +35,51 @@ void TestRunner(void);
 /* Heap Inputs Verification Tests
  *
  * Naming convention:
- * verify_inputs_<block_sizes>_<num_blocks>()
- *
+ * test_inputs_<block_sizes>_<num_pools>()
 */
-bool verify_inputs_small_none(void);
-bool verify_inputs_small_single(void);
-bool verify_inputs_small_multiple(void);
-bool verify_inputs_large_single(void);
-bool verify_inputs_large_multiple(void);
-bool verify_inputs_mixed_multiple(void);
-bool verify_inputs_max_single(void);
-bool verify_inputs_exceed_single(void);
+bool test_inputs_small_none(void);
+bool test_inputs_small_single(void);
+bool test_inputs_small_multiple(void);
+bool test_inputs_large_single(void);
+bool test_inputs_large_multiple(void);
+bool test_inputs_mixed_multiple(void);
+bool test_inputs_max_single(void);
+bool test_inputs_exceed_single(void);
 
 
 /* Pool Initialization Tests
  *
  * Naming convention:
- * pool_init_<block_sizes>_<num_blocks>()
+ * test_pool_init_<block_sizes>_<num_pools>()
 */
 bool pool_init_base(const size_t* block_sizes, size_t block_size_count);
-bool pool_init_small_single(void);
-bool pool_init_small_multiple(void);
-bool pool_init_large_single(void);
-bool pool_init_large_multiple(void);
-bool pool_init_mixed_multiple(void);
-bool pool_init_max_single(void);
+bool test_pool_init_small_single(void);
+bool test_pool_init_small_multiple(void);
+bool test_pool_init_large_single(void);
+bool test_pool_init_large_multiple(void);
+bool test_pool_init_mixed_multiple(void);
+bool test_pool_init_max_single(void);
+
+
+/* Pool Malloc Tests
+ *
+ * Naming convention:
+ * test_pool_malloc_<num_mallocs/pool>_<num_pools>()
+*/
+bool test_pool_malloc_single_single(void);
+bool test_pool_malloc_single_multiple(void);
+bool test_pool_malloc_multiple_single(void);
+bool test_pool_malloc_multiple_multiple(void);
+bool test_pool_malloc_max_single(void);
+bool test_pool_malloc_max_multiple(void);
+
+
+/* Pool Free Tests
+ *
+ * Naming convention:
+ * test_pool_free_<num_pools>()
+*/
+bool test_pool_free_single();
+bool test_pool_free_multiple(); 
+
+#endif // POOL_TESTS_H

@@ -10,14 +10,23 @@
 #define HEAP_SIZE 	65536
 #define MAX_POOLS	16
 
-// TODO: Document struct
-// NOTE: Pool end hold index to beginning of last block!!
+
+/* Pool Controller
+ *
+ * Used as a global object to track the state of the heap. 
+ * Its size is limited by the MAX_POOLS assumpion described in
+ * the pool_init() docstring
+ *
+*/
 typedef struct {
-	size_t* block_sizes[MAX_POOLS];
-	uint8_t  num_pools;
+	uint8_t num_pools;				// Used to track heap parameters
+	size_t block_sizes[MAX_POOLS];  // Used to track heap parameters
+	
 	uint16_t pool_begin_indices[MAX_POOLS];
 	uint32_t pool_end_indices[MAX_POOLS];
-	uint8_t* ppool_allocators[MAX_POOLS];
+	
+	bool pool_full[MAX_POOLS]; 
+	uint16_t pool_allocators[MAX_POOLS];  // Holds pool allocator idx in g_pool_heap
 } pool_controller_t; 
 
 
@@ -25,7 +34,7 @@ static uint8_t g_pool_heap[HEAP_SIZE];
 static pool_controller_t pool_controller; 
 
 
-/* Debug function for printing the heap at <idx +/- padding>
+/* DEBUG function for printing the heap at <idx +/- padding>
 */
 void print_heap_range(size_t idx, size_t padding);
 
@@ -46,7 +55,7 @@ bool verify_heap_inputs(const size_t* block_sizes, size_t block_size_count);
  *
  * 1. The heap is evenly divided amongst pools.
  *
- * 2. Block sizes cannot be larger than the pool size
+ * 2. Block sizes cannot exceed pool size
  *
  * Input Assumptions:
  
@@ -71,7 +80,6 @@ bool verify_heap_inputs(const size_t* block_sizes, size_t block_size_count);
  *    memory by limiting the size of the arrays in 
  *    the Pool Controller.
  *
- * Time complexity: O(HEAP_SIZE) 
 */
 bool pool_init(const size_t* block_sizes, size_t block_size_count);
 
@@ -83,7 +91,18 @@ bool pool_init(const size_t* block_sizes, size_t block_size_count);
 void* pool_malloc(size_t n);
 
 
-// Release allocation pointed to by ptr.
+/* Release allocation pointed to by ptr.
+ *
+ * Assumptions:
+ * 1. Argument must match a pointer earlier returned by a call
+ *    to pool_malloc()
+ *
+ *    This assumption is justified since it mimics the behaviour 
+ *	  of malloc() and free() 
+ *	  (ref: https://stackoverflow.com/questions/5308758/can-a-call-to-free-in-c-ever-fail)
+ *
+ *
+ */ 
 void pool_free(void* ptr);
 
 
